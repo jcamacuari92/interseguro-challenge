@@ -35,5 +35,4 @@ docker compose up --build
 ## 🌐 Demo en vivo (Render)
 
 | Servicio | URL |
-| :--- | :--- |
 | Frontend + Node API + GO API | https://interseguro-challenge-ww9k.onrender.com 
