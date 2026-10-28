@@ -31,3 +31,9 @@ Cliente → Go API (cálculo matricial) → Node API (estadísticas) → Cliente
 ```bash
 cp .env.example .env
 docker compose up --build
+
+## 🌐 Demo en vivo (Render)
+
+| Servicio | URL |
+| :--- | :--- |
+| Frontend + Node API + GO API | https://interseguro-challenge-ww9k.onrender.com 
