@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interseguro · Matrix Challenge</title>
+<style>
+  :root {
+    --primary: #0055b3;
+    --primary-dark: #003d80;
+    --accent: #00a3ff;
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --text-muted: #64748b;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.04);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    box-shadow: var(--shadow);
+  }
+  header h1 { margin: 0; font-size: 1.35rem; font-weight: 600; }
+  header p  { margin: .25rem 0 0; opacity: .85; font-size: .875rem; }
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; padding: 1rem; }
+  }
+  .card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .card h2 {
+    margin: 0 0 1rem;
+    font-size: .875rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  label {
+    display: block;
+    font-size: .875rem;
+    font-weight: 500;
+    margin-bottom: .5rem;
+    color: var(--text);
+  }
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: .875rem;
+    padding: .75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    resize: vertical;
+    transition: border-color .15s;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,85,179,.1);
+  }
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    margin-top: 1rem;
+  }
+  button {
+    padding: .75rem 1rem;
+    font-size: .875rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-secondary { background: var(--accent); color: white; }
+  .btn-secondary:hover:not(:disabled) { background: #0087d4; transform: translateY(-1px); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .examples {
+    margin-top: 1rem;
+    font-size: .8125rem;
+    color: var(--text-muted);
+  }
+  .examples button {
+    background: transparent;
+    color: var(--primary);
+    padding: .25rem .5rem;
+    font-size: .8125rem;
+    font-weight: 500;
+    border-radius: 4px;
+  }
+  .examples button:hover { background: rgba(0,85,179,.08); }
+  .status {
+    margin-top: 1rem;
+    padding: .75rem;
+    border-radius: 6px;
+    font-size: .875rem;
+    display: none;
+  }
+  .status.show { display: block; }
+  .status.error { background: #fef2f2; color: var(--error); border: 1px solid #fecaca; }
+  .status.success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+  .status.loading { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-header h2 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1rem; color: var(--text); }
+  .badge {
+    display: inline-block;
+    padding: .25rem .75rem;
+    border-radius: 9999px;
+    font-size: .75rem;
+    font-weight: 600;
+    background: rgba(0,85,179,.1);
+    color: var(--primary);
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .matrix-block h3 {
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 .75rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .matrix {
+    display: inline-flex;
+    align-items: stretch;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: .8125rem;
+  }
+  .matrix-bracket {
+    width: 8px;
+    border-top: 2px solid var(--text);
+    border-bottom: 2px solid var(--text);
+  }
+  .matrix-bracket.left  { border-left: 2px solid var(--text); border-radius: 4px 0 0 4px; }
+  .matrix-bracket.right { border-right: 2px solid var(--text); border-radius: 0 4px 4px 0; }
+  .matrix-body { padding: .25rem .5rem; }
+  .matrix-row { display: flex; gap: 1.5rem; justify-content: flex-end; }
+  .matrix-row span { min-width: 60px; text-align: right; padding: .125rem 0; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: .75rem;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .875rem;
+  }
+  .stat-label {
+    font-size: .75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: .25rem;
+  }
+  .stat-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    color: var(--text);
+    word-break: break-all;
+  }
+  .stat-value.true  { color: var(--success); }
+  .stat-value.false { color: var(--text-muted); }
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+  .empty-state svg { opacity: .3; margin-bottom: 1rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .section-title {
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Interseguro · Matrix Challenge</h1>
+  <p>Factorización QR y estadísticas · Go + Node.js + Docker</p>
+</header>
+
+<main>
+  <!-- ============ INPUT ============ -->
+  <aside class="card">
+    <h2>Matriz de entrada</h2>
+    <label for="matrixInput">JSON (array de arrays)</label>
+    <textarea id="matrixInput">[[1,2],[3,4]]</textarea>
+
+    <div class="buttons">
+      <button class="btn-primary"   id="btnQR">Factorizar QR</button>
+      <button class="btn-secondary" id="btnRotate">Rotar 90°</button>
+    </div>
+
+    <div class="examples">
+      Ejemplos:
+      <button data-example="[[1,2],[3,4]]">2×2</button> ·
+      <button data-example="[[1,2,3],[4,5,6]]">2×3</button> ·
+      <button data-example="[[1,2],[3,4],[5,6]]">3×2</button> ·
+      <button data-example="[[12,-51,4],[6,167,-68],[-4,24,-41]]">3×3</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </aside>
+
+  <!-- ============ OUTPUT ============ -->
+  <section class="card" id="result">
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+      <p>Ingresa una matriz y presiona un botón para ver resultados.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+// ============================================================
+// URL de la API Go — INYECTADA POR EL SERVIDOR
+// // El backend (src/index.js) inyecta la URL real en el placeholder de abajo
+//   - http://localhost:8080        (local)
+//   - https://...onrender.com      (producción)
+// ============================================================
+const GO_API = '__GO_API_URL__';
+
+const $matrix = document.getElementById('matrixInput');
+const $btnQR  = document.getElementById('btnQR');
+const $btnRot = document.getElementById('btnRotate');
+const $status = document.getElementById('status');
+const $result = document.getElementById('result');
+
+// ---------- helpers ----------
+function showStatus(type, message) {
+  $status.className = 'status show ' + type;
+  $status.textContent = message;
+}
+function hideStatus() {
+  $status.className = 'status';
+}
+function setLoading(loading) {
+  $btnQR.disabled = loading;
+  $btnRot.disabled = loading;
+}
+
+function renderMatrix(data, title) {
+  const rows = data.map(row =>
+    `<div class="matrix-row">${row.map(v =>
+      `<span>${Number(v).toFixed(4)}</span>`).join('')}</div>`
+  ).join('');
+  return `
+    <div class="matrix-block">
+      <h3>${title}</h3>
+      <div class="matrix">
+        <div class="matrix-bracket left"></div>
+        <div class="matrix-body">${rows}</div>
+        <div class="matrix-bracket right"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStats(stats) {
+  const cells = [
+    { label: 'Máximo',            value: Number(stats.max).toFixed(4) },
+    { label: 'Mínimo',            value: Number(stats.min).toFixed(4) },
+    { label: 'Promedio',          value: Number(stats.average).toFixed(4) },
+    { label: 'Suma total',        value: Number(stats.totalSum).toFixed(4) },
+    { label: 'Elementos',         value: stats.count },
+    { label: '¿Alguna diagonal?', value: stats.diagonalInfo.anyDiagonal, isBool: true },
+  ];
+  const cards = cells.map(c => `
+    <div class="stat-card">
+      <div class="stat-label">${c.label}</div>
+      <div class="stat-value ${c.isBool ? c.value : ''}">${c.isBool ? (c.value ? 'Sí' : 'No') : c.value}</div>
+    </div>
+  `).join('');
+  return `<div class="stats-grid">${cards}</div>`;
+}
+
+function renderResult(operation, original, primary, secondary, stats) {
+  const opLabel = operation === 'QR_FACTORIZATION' ? 'Factorización QR' : 'Rotación 90° CW';
+  const html = `
+    <div class="result-header">
+      <h2>${opLabel}</h2>
+      <span class="badge">${original.rows}×${original.columns} → ${primary.rows}×${primary.columns}</span>
+    </div>
+    <div class="grid-2">
+      ${renderMatrix(original.data, 'Original')}
+      ${renderMatrix(primary.data, secondary ? 'Q' : 'Rotada')}
+    </div>
+    ${secondary ? `<div class="grid-2">${renderMatrix(secondary.data, 'R')}</div>` : ''}
+    <hr class="divider">
+    <p class="section-title">Estadísticas (calculadas por Node.js)</p>
+    ${renderStats(stats)}
+  `;
+  $result.innerHTML = html;
+}
+
+// ---------- actions ----------
+async function callAPI(path, payload) {
+  setLoading(true);
+  hideStatus();
+  showStatus('loading', 'Enviando a la API Go...');
+
+  try {
+    const res = await fetch(GO_API + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+    return json;
+  } finally {
+    setLoading(false);
+  }
+}
+
+$btnQR.addEventListener('click', async () => {
+  try {
+    const matrix = JSON.parse($matrix.value);
+    const r = await callAPI('/api/v1/qr', { matrix });
+    renderResult(r.operation, r.original, r.qr.q, r.qr.r, r.statistics);
+    showStatus('success', 'Factorización QR completada.');
+  } catch (err) {
+    showStatus('error', 'Error: ' + err.message);
+  }
+});
+
+$btnRot.addEventListener('click', async () => {
+  try {
+    const matrix = JSON.parse($matrix.value);
+    const r = await callAPI('/api/v1/rotate', { matrix });
+    renderResult(r.operation, r.original, r.rotated, null, r.statistics);
+    showStatus('success', 'Rotación completada.');
+  } catch (err) {
+    showStatus('error', 'Error: ' + err.message);
+  }
+});
+
+document.querySelectorAll('[data-example]').forEach(b => {
+  b.addEventListener('click', () => { $matrix.value = b.dataset.example; });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+services:
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    container_name: interseguro-go-api
+    ports:
+      - "${GO_API_PORT:-8080}:8080"
+    environment:
+      - PORT=8080
+      - NODE_API_URL=${NODE_API_URL:-http://node-api:3000}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      node-api:
+        condition: service_healthy
+    networks:
+      - interseguro-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  node-api:
+    build:
+      context: ./node-api
+      dockerfile: Dockerfile
+    container_name: interseguro-node-api
+    ports:
+      - "${NODE_API_PORT:-3000}:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - interseguro-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  interseguro-net:
+    driver: bridge
